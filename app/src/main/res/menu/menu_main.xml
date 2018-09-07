@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/action_profile"
+        android:title="@string/action_profile"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_sign_out"

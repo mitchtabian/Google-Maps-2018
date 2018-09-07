@@ -27,17 +27,27 @@
     <string name="collection_chatrooms">Chatrooms</string>
     <string name="collection_chat_messages">Chat Messages</string>
     <string name="collection_chatroom_user_list">User List</string>
+    <string name="collection_user_locations">User Locations</string>
 
     <!-- Intent extras -->
     <string name="intent_chatroom">intent_chatroom</string>
     <string name="intent_user_list">intent_user_list</string>
+    <string name="intent_user_locations">intent_user_locations</string>
+    <string name="intent_location">intent_location</string>
+
+    <!-- Service and Broadcasts -->
+    <string name="gps_location">gps_location</string>
+
 
     <!-- Fragments Names -->
     <string name="fragment_user_list">User List</string>
+    <string name="fragment_image_list">Image List</string>
 
     <!-- Other Strings -->
     <string name="action_create_chatroom">Create Chatroom</string>
     <string name="action_leave_chatroom">Leave chatroom</string>
     <string name="action_chatroom_user_list">User list</string>
+    <string name="action_profile">Profile</string>
+
 
 </resources>

@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements
     //vars
     private ArrayList<Chatroom> mChatrooms = new ArrayList<>();
     private Set<String> mChatroomIds = new HashSet<>();
-//    private Set<Chatroom> mChatrooms = new HashSet<>();
     private ChatroomRecyclerAdapter mChatroomRecyclerAdapter;
     private RecyclerView mChatroomRecyclerView;
     private ListenerRegistration mChatroomEventListener;
@@ -86,55 +85,6 @@ public class MainActivity extends AppCompatActivity implements
         setTitle("Chatrooms");
     }
 
-
-    public boolean isMapsEnabled(){
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            buildAlertMessageNoGps();
-            return false;
-        }
-        return true;
-    }
-
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    public boolean isServicesOK(){
-        Log.d(TAG, "isServicesOK: checking google services version");
-
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
-
-        if(available == ConnectionResult.SUCCESS){
-            //everything is fine and the user can make map requests
-            Log.d(TAG, "isServicesOK: Google Play Services is working");
-            return true;
-        }
-        else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
-            //an error occured but we can resolve it
-            Log.d(TAG, "isServicesOK: an error occured but we can fix it");
-            Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
-            dialog.show();
-        }else{
-            Toast.makeText(this, "You can't make map requests", Toast.LENGTH_SHORT).show();
-        }
-        return false;
-    }
 
     @Override
     public void onClick(View view) {
@@ -273,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onChatroomSelected(int position) {
         navChatroomActivity(mChatrooms.get(position));
-//        navChatroomActivity( ((Chatroom)(mChatrooms.toArray()[position])));
     }
 
     private void signOut(){
@@ -296,6 +245,10 @@ public class MainActivity extends AppCompatActivity implements
         switch(item.getItemId()){
             case R.id.action_sign_out:{
                 signOut();
+                return true;
+            }
+            case R.id.action_profile:{
+                startActivity(new Intent(this, ProfileActivity.class));
                 return true;
             }
             default:{
