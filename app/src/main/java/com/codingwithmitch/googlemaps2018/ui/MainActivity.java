@@ -27,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.codingwithmitch.googlemaps2018.R;
+import com.codingwithmitch.googlemaps2018.UserClient;
 import com.codingwithmitch.googlemaps2018.adapters.ChatroomRecyclerAdapter;
 import com.codingwithmitch.googlemaps2018.models.Chatroom;
 import com.codingwithmitch.googlemaps2018.models.User;
@@ -98,22 +99,28 @@ public class MainActivity extends AppCompatActivity implements
         initChatroomRecyclerView();
     }
 
-    private void getUserDetails(){
-        mUserLocation = new UserLocation();
-        DocumentReference userRef = mDb.collection(getString(R.string.collection_users))
-                .document(FirebaseAuth.getInstance().getUid());
 
-        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    Log.d(TAG, "onComplete: successfully set the user client.");
-                    User user = task.getResult().toObject(User.class);
-                    mUserLocation.setUser(user);
-                    getLastKnownLocation();
+    private void getUserDetails(){
+        if(mUserLocation == null){
+            mUserLocation = new UserLocation();
+            DocumentReference userRef = mDb.collection(getString(R.string.collection_users))
+                    .document(FirebaseAuth.getInstance().getUid());
+
+            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.isSuccessful()){
+                        Log.d(TAG, "onComplete: successfully set the user client.");
+                        User user = task.getResult().toObject(User.class);
+                        mUserLocation.setUser(user);
+                        getLastKnownLocation();
+                    }
                 }
-            }
-        });
+            });
+        }
+        else{
+            getLastKnownLocation();
+        }
     }
 
     private void getLastKnownLocation() {
