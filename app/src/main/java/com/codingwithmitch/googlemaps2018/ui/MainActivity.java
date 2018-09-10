@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements
                         Log.d(TAG, "onComplete: successfully set the user client.");
                         User user = task.getResult().toObject(User.class);
                         mUserLocation.setUser(user);
+						((UserClient)(getApplicationContext())).setUser(user);
                         getLastKnownLocation();
                     }
                 }
