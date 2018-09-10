@@ -27,12 +27,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.codingwithmitch.googlemaps2018.R;
-import com.codingwithmitch.googlemaps2018.UserClient;
 import com.codingwithmitch.googlemaps2018.adapters.ChatroomRecyclerAdapter;
 import com.codingwithmitch.googlemaps2018.models.Chatroom;
 import com.codingwithmitch.googlemaps2018.models.User;
 import com.codingwithmitch.googlemaps2018.models.UserLocation;
-import com.codingwithmitch.googlemaps2018.util.ICallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -101,38 +99,21 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void getUserDetails(){
-        final ICallback callback = new ICallback() {
+        mUserLocation = new UserLocation();
+        DocumentReference userRef = mDb.collection(getString(R.string.collection_users))
+                .document(FirebaseAuth.getInstance().getUid());
+
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void done(Exception e) {
-                if(e == null){
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    Log.d(TAG, "onComplete: successfully set the user client.");
+                    User user = task.getResult().toObject(User.class);
+                    mUserLocation.setUser(user);
                     getLastKnownLocation();
                 }
-                else{
-                    Log.e(TAG, "done: Exception: " + e.getMessage() );
-                }
             }
-        };
-
-        if(mUserLocation == null){
-            mUserLocation = new UserLocation();
-            DocumentReference userRef = mDb.collection(getString(R.string.collection_users))
-                    .document(FirebaseAuth.getInstance().getUid());
-
-            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if(task.isSuccessful()){
-                        Log.d(TAG, "onComplete: successfully set the user client.");
-                        User user = task.getResult().toObject(User.class);
-                        mUserLocation.setUser(user);
-                        callback.done(null);
-                    }
-                }
-            });
-        }
-        else{
-            callback.done(null);
-        }
+        });
     }
 
     private void getLastKnownLocation() {
@@ -221,7 +202,6 @@ public class MainActivity extends AppCompatActivity implements
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
             getChatrooms();
-//            getLastKnownLocation();
             getUserDetails();
         } else {
             ActivityCompat.requestPermissions(this,
@@ -275,7 +255,6 @@ public class MainActivity extends AppCompatActivity implements
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
                     getChatrooms();
-//                    getLastKnownLocation();
                     getUserDetails();
                 }
                 else{
@@ -425,7 +404,6 @@ public class MainActivity extends AppCompatActivity implements
         if(checkMapServices()){
             if(mLocationPermissionGranted){
                 getChatrooms();
-                getLastKnownLocation();
                 getUserDetails();
             }
             else{
