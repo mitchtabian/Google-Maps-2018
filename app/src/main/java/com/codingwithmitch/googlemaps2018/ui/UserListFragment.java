@@ -60,9 +60,15 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_list, container, false);
         mUserListRecyclerView = view.findViewById(R.id.user_list_recycler_view);
+        mMapView = view.findViewById(R.id.user_list_map);
 
         initUserListRecyclerView();
+        initGoogleMap(savedInstanceState);
 
+        return view;
+    }
+
+    private void initGoogleMap(Bundle savedInstanceState){
         // *** IMPORTANT ***
         // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
         // objects or sub-Bundles.
@@ -70,14 +76,11 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
         }
-        mMapView = view.findViewById(R.id.user_list_map);
+
         mMapView.onCreate(mapViewBundle);
 
         mMapView.getMapAsync(this);
-
-        return view;
     }
-
 
     private void initUserListRecyclerView() {
         mUserRecyclerAdapter = new UserRecyclerAdapter(mUserList);
