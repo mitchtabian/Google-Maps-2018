@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import com.codingwithmitch.googlemaps2018.R;
 import com.codingwithmitch.googlemaps2018.adapters.UserRecyclerAdapter;
 import com.codingwithmitch.googlemaps2018.models.User;
+import com.codingwithmitch.googlemaps2018.models.UserLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -40,6 +42,7 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
 
     //vars
     private ArrayList<User> mUserList = new ArrayList<>();
+    private ArrayList<UserLocation> mUserLocations = new ArrayList<>();
     private UserRecyclerAdapter mUserRecyclerAdapter;
 
 
@@ -50,8 +53,14 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mUserList = getArguments().getParcelableArrayList(getString(R.string.intent_user_list));
+        if(mUserLocations.size() == 0){ // make sure the list doesn't duplicate by navigating back
+            if(getArguments() != null){
+                final ArrayList<User> users = getArguments().getParcelableArrayList(getString(R.string.intent_user_list));
+                mUserList.addAll(users);
+
+                final ArrayList<UserLocation> locations = getArguments().getParcelableArrayList(getString(R.string.intent_user_locations));
+                mUserLocations.addAll(locations);
+            }
         }
     }
 
@@ -64,6 +73,10 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
 
         initUserListRecyclerView();
         initGoogleMap(savedInstanceState);
+
+        for(UserLocation userLocation: mUserLocations){
+            Log.d(TAG, "onCreateView: user location: " + userLocation.getUser().getUsername());
+        }
 
         return view;
     }
