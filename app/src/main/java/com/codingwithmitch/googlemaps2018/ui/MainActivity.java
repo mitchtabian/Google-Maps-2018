@@ -87,8 +87,7 @@ public class MainActivity extends AppCompatActivity implements
         initChatroomRecyclerView();
 
     }
-
-    private boolean checkMapServices(){
+private boolean checkMapServices(){
         if(isServicesOK()){
             if(isMapsEnabled()){
                 return true;
@@ -131,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+            getChatrooms();
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -175,6 +175,22 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: called.");
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ENABLE_GPS: {
+                if(mLocationPermissionGranted){
+                    getChatrooms();
+                }
+                else{
+                    getLocationPermission();
+                }
+            }
+        }
+
+    }
 
     private void initSupportActionBar(){
         setTitle("Chatrooms");
