@@ -55,7 +55,6 @@ public class ChatroomActivity extends AppCompatActivity implements
     private ArrayList<ChatMessage> mMessages = new ArrayList<>();
     private Set<String> mMessageIds = new HashSet<>();
     private ArrayList<User> mUserList = new ArrayList<>();
-    private UserListFragment mUserListFragment;
 
 
     @Override
@@ -84,29 +83,29 @@ public class ChatroomActivity extends AppCompatActivity implements
         mChatMessageEventListener = messagesRef
                 .orderBy("timestamp", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.e(TAG, "onEvent: Listen failed.", e);
-                    return;
-                }
-
-                if(queryDocumentSnapshots != null){
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-
-                        ChatMessage message = doc.toObject(ChatMessage.class);
-                        if(!mMessageIds.contains(message.getMessage_id())){
-                            mMessageIds.add(message.getMessage_id());
-                            mMessages.add(message);
-                            mChatMessageRecyclerView.smoothScrollToPosition(mMessages.size() - 1);
+                    @Override
+                    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.e(TAG, "onEvent: Listen failed.", e);
+                            return;
                         }
 
-                    }
-                    mChatMessageRecyclerAdapter.notifyDataSetChanged();
+                        if(queryDocumentSnapshots != null){
+                            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
 
-                }
-            }
-        });
+                                ChatMessage message = doc.toObject(ChatMessage.class);
+                                if(!mMessageIds.contains(message.getMessage_id())){
+                                    mMessageIds.add(message.getMessage_id());
+                                    mMessages.add(message);
+                                    mChatMessageRecyclerView.smoothScrollToPosition(mMessages.size() - 1);
+                                }
+
+                            }
+                            mChatMessageRecyclerAdapter.notifyDataSetChanged();
+
+                        }
+                    }
+                });
     }
 
     private void getChatroomUsers(){
