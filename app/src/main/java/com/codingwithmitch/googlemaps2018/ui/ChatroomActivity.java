@@ -209,17 +209,14 @@ public class ChatroomActivity extends AppCompatActivity implements
     }
 
     private void inflateUserListFragment(){
-        if(mUserListFragment == null){
-            mUserListFragment = UserListFragment.newInstance();
-        }
-
+        UserListFragment fragment = UserListFragment.newInstance();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(getString(R.string.intent_user_list), mUserList);
-        mUserListFragment.setArguments(bundle);
+        fragment.setArguments(bundle);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_up);
-        transaction.replace(R.id.user_list_container, mUserListFragment, getString(R.string.fragment_user_list));
+        transaction.replace(R.id.user_list_container, fragment, getString(R.string.fragment_user_list));
         transaction.addToBackStack(getString(R.string.fragment_user_list));
         transaction.commit();
     }
@@ -289,12 +286,15 @@ public class ChatroomActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case android.R.id.home:{
-                if(mUserListFragment.isVisible()){
-                    getSupportFragmentManager().popBackStack();
+                UserListFragment fragment =
+                        (UserListFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.fragment_user_list));
+                if(fragment != null){
+                    if(fragment.isVisible()){
+                        getSupportFragmentManager().popBackStack();
+                        return true;
+                    }
                 }
-                else{
-                    finish();
-                }
+                finish();
                 return true;
             }
             case R.id.action_chatroom_user_list:{

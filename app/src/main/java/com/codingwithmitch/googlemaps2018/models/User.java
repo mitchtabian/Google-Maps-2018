@@ -3,16 +3,18 @@ package com.codingwithmitch.googlemaps2018.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class User implements Parcelable {
+public class User implements Parcelable{
 
     private String email;
     private String user_id;
     private String username;
+    private String avatar;
 
-    public User(String email, String user_id, String username) {
+    public User(String email, String user_id, String username, String avatar) {
         this.email = email;
         this.user_id = user_id;
         this.username = username;
+        this.avatar = avatar;
     }
 
     public User() {
@@ -23,6 +25,7 @@ public class User implements Parcelable {
         email = in.readString();
         user_id = in.readString();
         username = in.readString();
+        avatar = in.readString();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -36,6 +39,18 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public static Creator<User> getCREATOR() {
+        return CREATOR;
+    }
 
     public String getEmail() {
         return email;
@@ -67,6 +82,7 @@ public class User implements Parcelable {
                 "email='" + email + '\'' +
                 ", user_id='" + user_id + '\'' +
                 ", username='" + username + '\'' +
+                ", avatar='" + avatar + '\'' +
                 '}';
     }
 
@@ -80,5 +96,7 @@ public class User implements Parcelable {
         dest.writeString(email);
         dest.writeString(user_id);
         dest.writeString(username);
+        dest.writeString(avatar);
     }
 }
+
