@@ -48,6 +48,10 @@ dependencies {
     // Google play services for location information
     implementation 'com.google.android.gms:play-services-location:15.0.1'
 	
+	// Google Maps Services (needed for directions)
+    implementation 'com.google.maps:google-maps-services:0.2.9'
+    implementation 'org.slf4j:slf4j-nop:1.7.25'
+	
     // glide
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
