@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import com.codingwithmitch.googlemaps2018.R;
 import com.codingwithmitch.googlemaps2018.adapters.UserRecyclerAdapter;
 import com.codingwithmitch.googlemaps2018.models.ClusterMarker;
+import com.codingwithmitch.googlemaps2018.models.PolylineData;
 import com.codingwithmitch.googlemaps2018.models.User;
 import com.codingwithmitch.googlemaps2018.models.UserLocation;
 import com.codingwithmitch.googlemaps2018.util.MyClusterManagerRenderer;
@@ -33,6 +34,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -57,7 +59,8 @@ import static com.codingwithmitch.googlemaps2018.Constants.MAPVIEW_BUNDLE_KEY;
 public class UserListFragment extends Fragment implements
         OnMapReadyCallback,
         View.OnClickListener,
-        GoogleMap.OnInfoWindowClickListener
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnPolylineClickListener
 {
 
     private static final String TAG = "UserListFragment";
@@ -83,6 +86,7 @@ public class UserListFragment extends Fragment implements
     private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
     private int mMapLayoutState = 0;
     private GeoApiContext mGeoApiContext;
+    private ArrayList<PolylineData> mPolyLinesData = new ArrayList<>();
 
 
     public static UserListFragment newInstance() {
@@ -341,6 +345,7 @@ public class UserListFragment extends Fragment implements
 
         mGoogleMap = map;
         addMapMarkers();
+        mGoogleMap.setOnPolylineClickListener(this);
     }
 
     @Override
@@ -489,6 +494,13 @@ public class UserListFragment extends Fragment implements
             @Override
             public void run() {
                 Log.d(TAG, "run: result routes: " + result.routes.length);
+                if(mPolyLinesData.size() > 0){
+                    for(PolylineData polylineData: mPolyLinesData){
+                        polylineData.getPolyline().remove();
+                    }
+                    mPolyLinesData.clear();
+                    mPolyLinesData = new ArrayList<>();
+                }
 
                 for(DirectionsRoute route: result.routes){
                     Log.d(TAG, "run: leg: " + route.legs[0].toString());
@@ -509,12 +521,28 @@ public class UserListFragment extends Fragment implements
                     Polyline polyline = mGoogleMap.addPolyline(new PolylineOptions().addAll(newDecodedPath));
                     polyline.setColor(ContextCompat.getColor(getActivity(), R.color.darkGrey));
                     polyline.setClickable(true);
+                    mPolyLinesData.add(new PolylineData(polyline, route.legs[0]));
 
                 }
             }
         });
     }
 
+    @Override
+    public void onPolylineClick(Polyline polyline) {
+
+        for(PolylineData polylineData: mPolyLinesData){
+            Log.d(TAG, "onPolylineClick: toString: " + polylineData.toString());
+            if(polyline.getId().equals(polylineData.getPolyline().getId())){
+                polylineData.getPolyline().setColor(ContextCompat.getColor(getActivity(), R.color.blue1));
+                polylineData.getPolyline().setZIndex(1);
+            }
+            else{
+                polylineData.getPolyline().setColor(ContextCompat.getColor(getActivity(), R.color.darkGrey));
+                polylineData.getPolyline().setZIndex(0);
+            }
+        }
+    }
 }
 
 
