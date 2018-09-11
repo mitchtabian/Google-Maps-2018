@@ -26,6 +26,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
@@ -44,6 +45,9 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<User> mUserList = new ArrayList<>();
     private ArrayList<UserLocation> mUserLocations = new ArrayList<>();
     private UserRecyclerAdapter mUserRecyclerAdapter;
+    private GoogleMap mGoogleMap;
+    private UserLocation mUserPosition;
+    private LatLngBounds mMapBoundary;
 
 
     public static UserListFragment newInstance() {
@@ -53,8 +57,8 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(mUserLocations.size() == 0){ // make sure the list doesn't duplicate by navigating back
-            if(getArguments() != null){
+        if (mUserLocations.size() == 0) { // make sure the list doesn't duplicate by navigating back
+            if (getArguments() != null) {
                 final ArrayList<User> users = getArguments().getParcelableArrayList(getString(R.string.intent_user_list));
                 mUserList.addAll(users);
 
@@ -74,14 +78,40 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
         initUserListRecyclerView();
         initGoogleMap(savedInstanceState);
 
-        for(UserLocation userLocation: mUserLocations){
-            Log.d(TAG, "onCreateView: user location: " + userLocation.getUser().getUsername());
-        }
+        setUserPosition();
 
         return view;
     }
 
-    private void initGoogleMap(Bundle savedInstanceState){
+    /**
+     * Determines the view boundary then sets the camera
+     * Sets the view
+     */
+    private void setCameraView() {
+
+        // Set a boundary to start
+        double bottomBoundary = mUserPosition.getGeo_point().getLatitude() - .1;
+        double leftBoundary = mUserPosition.getGeo_point().getLongitude() - .1;
+        double topBoundary = mUserPosition.getGeo_point().getLatitude() + .1;
+        double rightBoundary = mUserPosition.getGeo_point().getLongitude() + .1;
+
+        mMapBoundary = new LatLngBounds(
+                new LatLng(bottomBoundary, leftBoundary),
+                new LatLng(topBoundary, rightBoundary)
+        );
+
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mMapBoundary, 0));
+    }
+
+    private void setUserPosition() {
+        for (UserLocation userLocation : mUserLocations) {
+            if (userLocation.getUser().getUser_id().equals(FirebaseAuth.getInstance().getUid())) {
+                mUserPosition = userLocation;
+            }
+        }
+    }
+
+    private void initGoogleMap(Bundle savedInstanceState) {
         // *** IMPORTANT ***
         // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
         // objects or sub-Bundles.
@@ -138,16 +168,11 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
                 != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         map.setMyLocationEnabled(true);
+        mGoogleMap = map;
+        setCameraView();
     }
 
     @Override
