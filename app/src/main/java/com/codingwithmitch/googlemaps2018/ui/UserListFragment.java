@@ -2,6 +2,8 @@ package com.codingwithmitch.googlemaps2018.ui;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,6 +33,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -47,7 +50,8 @@ import static com.codingwithmitch.googlemaps2018.Constants.MAPVIEW_BUNDLE_KEY;
 
 public class UserListFragment extends Fragment implements
         OnMapReadyCallback,
-        View.OnClickListener
+        View.OnClickListener,
+        GoogleMap.OnInfoWindowClickListener
 {
 
     private static final String TAG = "UserListFragment";
@@ -189,6 +193,7 @@ public class UserListFragment extends Fragment implements
                 );
                 mClusterManager.setRenderer(mClusterManagerRenderer);
             }
+            mGoogleMap.setOnInfoWindowClickListener(this);
 
             for(UserLocation userLocation: mUserLocations){
 
@@ -399,6 +404,31 @@ public class UserListFragment extends Fragment implements
                 break;
             }
 
+        }
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        if(marker.getSnippet().equals("This is you")){
+            marker.hideInfoWindow();
+        }
+        else{
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage(marker.getSnippet())
+                    .setCancelable(true)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            dialog.cancel();
+                        }
+                    });
+            final AlertDialog alert = builder.create();
+            alert.show();
         }
     }
 }
