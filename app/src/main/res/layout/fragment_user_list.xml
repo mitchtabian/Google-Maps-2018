@@ -32,6 +32,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/user_list_map" />
+
+            <ImageButton
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/ic_full_screen_black_24dp"
+                android:background="@color/White"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:id="@+id/btn_full_screen_map"/>
+
         </RelativeLayout>
 
 

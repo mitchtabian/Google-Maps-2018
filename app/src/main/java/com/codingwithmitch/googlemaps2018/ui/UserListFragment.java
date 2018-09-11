@@ -1,6 +1,7 @@
 package com.codingwithmitch.googlemaps2018.ui;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 
 import com.codingwithmitch.googlemaps2018.R;
@@ -22,6 +24,7 @@ import com.codingwithmitch.googlemaps2018.models.ClusterMarker;
 import com.codingwithmitch.googlemaps2018.models.User;
 import com.codingwithmitch.googlemaps2018.models.UserLocation;
 import com.codingwithmitch.googlemaps2018.util.MyClusterManagerRenderer;
+import com.codingwithmitch.googlemaps2018.util.ViewWeightAnimationWrapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -42,13 +45,20 @@ import java.util.ArrayList;
 
 import static com.codingwithmitch.googlemaps2018.Constants.MAPVIEW_BUNDLE_KEY;
 
-public class UserListFragment extends Fragment implements OnMapReadyCallback {
+public class UserListFragment extends Fragment implements
+        OnMapReadyCallback,
+        View.OnClickListener
+{
 
     private static final String TAG = "UserListFragment";
+    private static final int MAP_LAYOUT_STATE_CONTRACTED = 0;
+    private static final int MAP_LAYOUT_STATE_EXPANDED = 1;
+
 
     //widgets
     private RecyclerView mUserListRecyclerView;
     private MapView mMapView;
+    private RelativeLayout mMapContainer;
 
 
     //vars
@@ -61,7 +71,7 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
     private ClusterManager<ClusterMarker> mClusterManager;
     private MyClusterManagerRenderer mClusterManagerRenderer;
     private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
-
+    private int mMapLayoutState = 0;
 
 
     public static UserListFragment newInstance() {
@@ -88,6 +98,8 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_user_list, container, false);
         mUserListRecyclerView = view.findViewById(R.id.user_list_recycler_view);
         mMapView = view.findViewById(R.id.user_list_map);
+        view.findViewById(R.id.btn_full_screen_map).setOnClickListener(this);
+        mMapContainer = view.findViewById(R.id.map_container);
 
         initUserListRecyclerView();
         initGoogleMap(savedInstanceState);
@@ -330,6 +342,64 @@ public class UserListFragment extends Fragment implements OnMapReadyCallback {
     public void onLowMemory() {
         super.onLowMemory();
         mMapView.onLowMemory();
+    }
+
+
+    private void expandMapAnimation(){
+        ViewWeightAnimationWrapper mapAnimationWrapper = new ViewWeightAnimationWrapper(mMapContainer);
+        ObjectAnimator mapAnimation = ObjectAnimator.ofFloat(mapAnimationWrapper,
+                "weight",
+                50,
+                100);
+        mapAnimation.setDuration(800);
+
+        ViewWeightAnimationWrapper recyclerAnimationWrapper = new ViewWeightAnimationWrapper(mUserListRecyclerView);
+        ObjectAnimator recyclerAnimation = ObjectAnimator.ofFloat(recyclerAnimationWrapper,
+                "weight",
+                50,
+                0);
+        recyclerAnimation.setDuration(800);
+
+        recyclerAnimation.start();
+        mapAnimation.start();
+    }
+
+    private void contractMapAnimation(){
+        ViewWeightAnimationWrapper mapAnimationWrapper = new ViewWeightAnimationWrapper(mMapContainer);
+        ObjectAnimator mapAnimation = ObjectAnimator.ofFloat(mapAnimationWrapper,
+                "weight",
+                100,
+                50);
+        mapAnimation.setDuration(800);
+
+        ViewWeightAnimationWrapper recyclerAnimationWrapper = new ViewWeightAnimationWrapper(mUserListRecyclerView);
+        ObjectAnimator recyclerAnimation = ObjectAnimator.ofFloat(recyclerAnimationWrapper,
+                "weight",
+                0,
+                50);
+        recyclerAnimation.setDuration(800);
+
+        recyclerAnimation.start();
+        mapAnimation.start();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_full_screen_map:{
+
+                if(mMapLayoutState == MAP_LAYOUT_STATE_CONTRACTED){
+                    mMapLayoutState = MAP_LAYOUT_STATE_EXPANDED;
+                    expandMapAnimation();
+                }
+                else if(mMapLayoutState == MAP_LAYOUT_STATE_EXPANDED){
+                    mMapLayoutState = MAP_LAYOUT_STATE_CONTRACTED;
+                    contractMapAnimation();
+                }
+                break;
+            }
+
+        }
     }
 }
 
