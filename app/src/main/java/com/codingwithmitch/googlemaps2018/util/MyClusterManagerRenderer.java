@@ -64,6 +64,17 @@ public class MyClusterManagerRenderer extends DefaultClusterRenderer<ClusterMark
     protected boolean shouldRenderAsCluster(Cluster cluster) {
         return false;
     }
+
+    /**
+     * Update the GPS coordinate of a ClusterItem
+     * @param clusterMarker
+     */
+    public void setUpdateMarker(ClusterMarker clusterMarker) {
+        Marker marker = getMarker(clusterMarker);
+        if (marker != null) {
+            marker.setPosition(clusterMarker.getPosition());
+        }
+    }
 }
 
 
