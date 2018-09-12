@@ -88,6 +88,7 @@ public class UserListFragment extends Fragment implements
     private GeoApiContext mGeoApiContext;
     private ArrayList<PolylineData> mPolyLinesData = new ArrayList<>();
     private Marker mSelectedMarker = null;
+    private ArrayList<Marker> mTripMarkers = new ArrayList<>();
 
 
     public static UserListFragment newInstance() {
@@ -438,6 +439,7 @@ public class UserListFragment extends Fragment implements
                     .setCancelable(true)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                            resetSelectedMarker();
                             mSelectedMarker = marker;
                             calculateDirections(marker);
                             dialog.dismiss();
@@ -490,6 +492,19 @@ public class UserListFragment extends Fragment implements
         });
     }
 
+    private void resetSelectedMarker(){
+        if(mSelectedMarker != null){
+            mSelectedMarker.setVisible(true);
+            mSelectedMarker = null;
+            removeTripMarkers();
+        }
+    }
+
+    private void removeTripMarkers(){
+        for(Marker marker: mTripMarkers){
+            marker.remove();
+        }
+    }
 
     private void addPolylinesToMap(final DirectionsResult result){
         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -561,6 +576,7 @@ public class UserListFragment extends Fragment implements
                         .snippet("Duration: " + polylineData.getLeg().duration
                         ));
 
+                mTripMarkers.add(marker);
 
                 marker.showInfoWindow();
             }
