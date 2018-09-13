@@ -116,6 +116,7 @@ public class UserListFragment extends Fragment implements
         mUserListRecyclerView = view.findViewById(R.id.user_list_recycler_view);
         mMapView = view.findViewById(R.id.user_list_map);
         view.findViewById(R.id.btn_full_screen_map).setOnClickListener(this);
+        view.findViewById(R.id.btn_reset_map).setOnClickListener(this);
         mMapContainer = view.findViewById(R.id.map_container);
 
         initUserListRecyclerView();
@@ -195,6 +196,8 @@ public class UserListFragment extends Fragment implements
 
         if(mGoogleMap != null){
 
+            resetMap();
+
             if(mClusterManager == null){
                 mClusterManager = new ClusterManager<ClusterMarker>(getActivity().getApplicationContext(), mGoogleMap);
             }
@@ -244,6 +247,26 @@ public class UserListFragment extends Fragment implements
             mClusterManager.cluster();
 
             setCameraView();
+        }
+    }
+
+    private void resetMap(){
+        if(mGoogleMap != null) {
+            mGoogleMap.clear();
+
+            if(mClusterManager != null){
+                mClusterManager.clearItems();
+            }
+
+            if (mClusterMarkers.size() > 0) {
+                mClusterMarkers.clear();
+                mClusterMarkers = new ArrayList<>();
+            }
+
+            if(mPolyLinesData.size() > 0){
+                mPolyLinesData.clear();
+                mPolyLinesData = new ArrayList<>();
+            }
         }
     }
 
@@ -423,7 +446,11 @@ public class UserListFragment extends Fragment implements
                 }
                 break;
             }
-
+            case R.id.btn_reset_map:{
+                addMapMarkers();
+                startUserLocationsRunnable();
+                break;
+            }
         }
     }
 
