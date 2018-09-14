@@ -14,9 +14,7 @@ import android.view.ViewGroup;
 import com.codingwithmitch.googlemaps2018.R;
 import com.codingwithmitch.googlemaps2018.adapters.UserRecyclerAdapter;
 import com.codingwithmitch.googlemaps2018.models.User;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.OnMapReadyCallback;
+
 
 import java.util.ArrayList;
 
