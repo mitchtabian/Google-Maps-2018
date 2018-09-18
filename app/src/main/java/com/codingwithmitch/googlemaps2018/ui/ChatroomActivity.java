@@ -232,6 +232,8 @@ public class ChatroomActivity extends AppCompatActivity implements
     }
 
     private void inflateUserListFragment(){
+		hideSoftKeyboard();
+		
         UserListFragment fragment = UserListFragment.newInstance();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(getString(R.string.intent_user_list), mUserList);
@@ -243,6 +245,10 @@ public class ChatroomActivity extends AppCompatActivity implements
         transaction.replace(R.id.user_list_container, fragment, getString(R.string.fragment_user_list));
         transaction.addToBackStack(getString(R.string.fragment_user_list));
         transaction.commit();
+    }
+	
+	private void hideSoftKeyboard(){
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
 
