@@ -3,6 +3,8 @@ package com.codingwithmitch.googlemaps2018.ui;
 import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 
 import com.codingwithmitch.googlemaps2018.R;
@@ -457,20 +460,27 @@ public class UserListFragment extends Fragment implements
 
     @Override
     public void onInfoWindowClick(final Marker marker) {
-        if(marker.getSnippet().equals("This is you")){
-            marker.hideInfoWindow();
-        }
-        else{
-
+        if(marker.getTitle().contains("Trip #")){
             final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage(marker.getSnippet())
+            builder.setMessage("Open Google Maps?")
                     .setCancelable(true)
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                            resetSelectedMarker();
-                            mSelectedMarker = marker;
-                            calculateDirections(marker);
-                            dialog.dismiss();
+                            String latitude = String.valueOf(marker.getPosition().latitude);
+                            String longitude = String.valueOf(marker.getPosition().longitude);
+                            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + latitude + "," + longitude);
+                            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                            mapIntent.setPackage("com.google.android.apps.maps");
+
+                            try{
+                                if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                                    startActivity(mapIntent);
+                                }
+                            }catch (NullPointerException e){
+                                Log.e(TAG, "onClick: NullPointerException: Couldn't open map." + e.getMessage() );
+                                Toast.makeText(getActivity(), "Couldn't open map", Toast.LENGTH_SHORT).show();
+                            }
+
                         }
                     })
                     .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -481,6 +491,33 @@ public class UserListFragment extends Fragment implements
             final AlertDialog alert = builder.create();
             alert.show();
         }
+        else{
+            if(marker.getSnippet().equals("This is you")){
+                marker.hideInfoWindow();
+            }
+            else{
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage(marker.getSnippet())
+                        .setCancelable(true)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                resetSelectedMarker();
+                                mSelectedMarker = marker;
+                                calculateDirections(marker);
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                                dialog.cancel();
+                            }
+                        });
+                final AlertDialog alert = builder.create();
+                alert.show();
+            }
+        }
+
     }
 
     private void calculateDirections(Marker marker){
@@ -636,21 +673,20 @@ public class UserListFragment extends Fragment implements
 
     @Override
     public void onUserClicked(int position) {
-        Log.d(TAG, "onUserClicked: selected a user: " + mUserList.get(position).toString());
+        Log.d(TAG, "onUserClicked: selected a user: " + mUserList.get(position).getUser_id());
+
         String selectedUserId = mUserList.get(position).getUser_id();
 
         for(ClusterMarker clusterMarker: mClusterMarkers){
             if(selectedUserId.equals(clusterMarker.getUser().getUser_id())){
-                mGoogleMap.animateCamera(
-                        CameraUpdateFactory.newLatLng(
-                                new LatLng(clusterMarker.getPosition().latitude, clusterMarker.getPosition().longitude)),
+                mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(
+                        new LatLng(clusterMarker.getPosition().latitude, clusterMarker.getPosition().longitude)),
                         600,
                         null
                 );
                 break;
             }
         }
-
     }
 }
 
