@@ -7,7 +7,7 @@
 <h3>What you'll learn:</h3>
 <ol>
   <li>Enabling the Google Maps SDK for Android</li>
-  <li>Ebaling the Google Directions API for Android</li>
+  <li>Enabling the Google Directions API for Android</li>
   <li>MapView objects</li>
   <li>Animating and moving the camera view</li>
   <li>Setting view bounds on a google map</li>
