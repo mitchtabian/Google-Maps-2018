@@ -11,7 +11,7 @@
   <li>MapView objects</li>
   <li>Animating and moving the camera view</li>
   <li>Setting view bounds on a google map</li>
-  <li>Building a thread that retrieves coordinates a database</li>
+  <li>Building a thread that retrieves coordinates from a database</li>
   <li>Building a service that inserts coordinates into a database</li>
   <li>Create custom map markers with images</li>
   <li>Get real time gps updates of users (Like Uber does)</li>
