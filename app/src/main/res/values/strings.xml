@@ -49,5 +49,6 @@
     <string name="action_chatroom_user_list">User list</string>
     <string name="action_profile">Profile</string>
 
+    <string name="maps_api_key">AIzaSyB8Ygc0PYpUHGrovc3p6q6sE8UdZDZJMY4</string>
 
 </resources>
