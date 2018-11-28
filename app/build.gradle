@@ -46,6 +46,10 @@ dependencies {
     // Circle ImageView
     implementation 'de.hdodenhof:circleimageview:2.2.0'
 
+    // Google marker cluster
+    implementation'com.google.maps.android:android-maps-utils:0.5+'
+
+
     //Google services
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
     implementation 'com.google.android.gms:play-services-places:15.0.1'
