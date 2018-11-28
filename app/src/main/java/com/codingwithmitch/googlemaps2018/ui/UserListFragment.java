@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Camera;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,9 +20,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -43,6 +49,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
@@ -52,19 +59,24 @@ import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.codingwithmitch.googlemaps2018.Constants.MAPVIEW_BUNDLE_KEY;
 
 public class UserListFragment extends Fragment implements
-        OnMapReadyCallback, View.OnClickListener, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnPolylineClickListener {
+        OnMapReadyCallback, View.OnClickListener,
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnPolylineClickListener {
 
     private static final String TAG = "UserListFragment";
+    private static final float DEFAULT_ZOOM = 15f;
 
     //widgets
     private RecyclerView mUserListRecyclerView;
     private MapView mMapView;
+    private EditText mSearchText;
 
 
     //vars
@@ -93,6 +105,7 @@ public class UserListFragment extends Fragment implements
             mUserList = getArguments().getParcelableArrayList(getString(R.string.intent_user_list));
             mUserLocations = getArguments().getParcelableArrayList(getString(R.string.intent_user_locations));
         }
+
     }
 
     private void addPolylinesToMap(final DirectionsResult result){
@@ -150,6 +163,8 @@ public class UserListFragment extends Fragment implements
         mUserListRecyclerView = view.findViewById(R.id.user_list_recycler_view);
         mMapView = (MapView) view.findViewById(R.id.user_list_map);
         view.findViewById(R.id.btn_reset_map).setOnClickListener(this);
+        mSearchText = (EditText) view.findViewById(R.id.input_search);
+
         initUserListRecyclerView();
         initGoogleMap(savedInstanceState);
 
@@ -319,11 +334,63 @@ public class UserListFragment extends Fragment implements
 
         mMapView.getMapAsync(this);
 
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        ||keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+                    geoLocate();
+                }
+                return false;
+            }
+        });
+
         if(mGeoApiContext == null){
             mGeoApiContext = new GeoApiContext.Builder()
                     .apiKey(getString(R.string.maps_api_key))
                     .build();
         }
+    }
+
+    private void geoLocate(){
+        Log.d(TAG, "geoLocate: geolocating");
+
+        String searchString = mSearchText.getText().toString();
+
+        Geocoder geocoder = new Geocoder(getContext());
+        List<Address> list = new ArrayList<>();
+        try{
+            list = geocoder.getFromLocationName(searchString, 1);
+        }catch (IOException e){
+            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
+        }
+
+        if(list.size() > 0){
+            Address address = list.get(0);
+
+            Log.d(TAG, "geoLocate: found a location: " + address.toString());
+            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+
+            //GeoPoint gp = new GeoPoint(address.getLatitude(), address.getLongitude());
+            //mUserPosition.setGeo_point(gp);
+            //setCameraView();
+
+            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()),
+                    DEFAULT_ZOOM,
+                    address.getAddressLine(0));
+        }
+    }
+    
+    private void moveCamera(LatLng latLng, float zoom, String title){
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .title(title);
+        mGoogleMap.addMarker(options);
+        
     }
 
 
