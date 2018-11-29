@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -77,6 +78,7 @@ public class UserListFragment extends Fragment implements
     private RecyclerView mUserListRecyclerView;
     private MapView mMapView;
     private EditText mSearchText;
+    //private ImageView mGps;
 
 
     //vars
@@ -163,6 +165,7 @@ public class UserListFragment extends Fragment implements
         mUserListRecyclerView = view.findViewById(R.id.user_list_recycler_view);
         mMapView = (MapView) view.findViewById(R.id.user_list_map);
         view.findViewById(R.id.btn_reset_map).setOnClickListener(this);
+        view.findViewById(R.id.ic_gps).setOnClickListener(this);
         mSearchText = (EditText) view.findViewById(R.id.input_search);
 
         initUserListRecyclerView();
@@ -444,6 +447,7 @@ public class UserListFragment extends Fragment implements
         map.setMyLocationEnabled(true);
         mGoogleMap = map;
         addMapMarkers();
+        mGoogleMap.getUiSettings().setMyLocationButtonEnabled(false);
         mGoogleMap.setOnPolylineClickListener(this);
         mGoogleMap.setOnInfoWindowClickListener(this);
     }
@@ -472,6 +476,11 @@ public class UserListFragment extends Fragment implements
             case R.id.btn_reset_map: {
                 addMapMarkers();
                 break;
+            }
+            case R.id.ic_gps: {
+                moveCamera(new LatLng(mUserPosition.getGeo_point().getLatitude(),
+                        mUserPosition.getGeo_point().getLongitude()), DEFAULT_ZOOM,
+                        "Your Location");
             }
         }
     }

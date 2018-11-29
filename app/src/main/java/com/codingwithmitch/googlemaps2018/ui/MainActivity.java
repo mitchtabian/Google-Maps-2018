@@ -87,11 +87,12 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.fragment_user_list);
         setContentView(R.layout.activity_main);
         mProgressBar = findViewById(R.id.progressBar);
         mChatroomRecyclerView = findViewById(R.id.chatrooms_recycler_view);
 
-        findViewById(R.id.fab_create_chatroom).setOnClickListener(this);
+        //findViewById(R.id.fab_create_chatroom).setOnClickListener(this);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
