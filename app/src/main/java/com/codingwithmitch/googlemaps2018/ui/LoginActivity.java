@@ -171,6 +171,7 @@ public class LoginActivity extends AppCompatActivity implements
         switch (view.getId()){
             case R.id.link_register:{
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                //Intent intent = new Intent(LoginActivity.this, UserListFragment.class);
                 startActivity(intent);
                 break;
             }
