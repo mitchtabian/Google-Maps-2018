@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -33,7 +34,8 @@ public class RegisterActivity extends AppCompatActivity implements
     private static final String TAG = "RegisterActivity";
 
     //widgets
-    private EditText mEmail, mPassword, mConfirmPassword;
+    private EditText mEmail, mName, mAddress, mPassword, mConfirmPassword;
+    private CheckBox mCheckBox;
     private ProgressBar mProgressBar;
 
     //vars
@@ -45,8 +47,11 @@ public class RegisterActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         mEmail = (EditText) findViewById(R.id.input_email);
+        mName = (EditText) findViewById(R.id.input_name);
+        mAddress = (EditText) findViewById(R.id.input_address);
         mPassword = (EditText) findViewById(R.id.input_password);
         mConfirmPassword = (EditText) findViewById(R.id.input_confirm_password);
+        mCheckBox = (CheckBox) findViewById(R.id.checkbox);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         findViewById(R.id.btn_register).setOnClickListener(this);
@@ -61,7 +66,7 @@ public class RegisterActivity extends AppCompatActivity implements
      * @param email
      * @param password
      */
-    public void registerNewEmail(final String email, String password){
+    public void registerNewEmail(final String email, final String name, final String address, String password){
 
         showDialog();
 
@@ -77,7 +82,8 @@ public class RegisterActivity extends AppCompatActivity implements
                             //insert some default data
                             User user = new User();
                             user.setEmail(email);
-                            user.setUsername(email.substring(0, email.indexOf("@")));
+                            user.setAddress(address);
+                            user.setUsername(name);
                             user.setUser_id(FirebaseAuth.getInstance().getUid());
 
                             FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
@@ -150,14 +156,22 @@ public class RegisterActivity extends AppCompatActivity implements
 
                 //check for null valued EditText fields
                 if(!isEmpty(mEmail.getText().toString())
+                        && !isEmpty(mName.getText().toString())
+                        && !isEmpty(mAddress.getText().toString())
                         && !isEmpty(mPassword.getText().toString())
                         && !isEmpty(mConfirmPassword.getText().toString())){
+
+                    //check if terms of service box is unchecked
+                    if(!mCheckBox.isChecked()){
+                        Toast.makeText(RegisterActivity.this, "You must agree to the terms of service", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
 
                     //check if passwords match
                     if(doStringsMatch(mPassword.getText().toString(), mConfirmPassword.getText().toString())){
 
                         //Initiate registration task
-                        registerNewEmail(mEmail.getText().toString(), mPassword.getText().toString());
+                        registerNewEmail(mEmail.getText().toString(), mName.getText().toString(), mAddress.getText().toString(), mPassword.getText().toString());
                     }else{
                         Toast.makeText(RegisterActivity.this, "Passwords do not Match", Toast.LENGTH_SHORT).show();
                     }

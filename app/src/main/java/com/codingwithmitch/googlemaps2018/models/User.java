@@ -8,12 +8,14 @@ public class User implements Parcelable{
     private String email;
     private String user_id;
     private String username;
+    private String address;
     private String avatar;
 
-    public User(String email, String user_id, String username, String avatar) {
+    public User(String email, String user_id, String username, String address, String avatar) {
         this.email = email;
         this.user_id = user_id;
         this.username = username;
+        this.address = address;
         this.avatar = avatar;
     }
 
@@ -25,6 +27,7 @@ public class User implements Parcelable{
         email = in.readString();
         user_id = in.readString();
         username = in.readString();
+        address = in.readString();
         avatar = in.readString();
     }
 
@@ -76,12 +79,21 @@ public class User implements Parcelable{
         this.username = username;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "email='" + email + '\'' +
                 ", user_id='" + user_id + '\'' +
                 ", username='" + username + '\'' +
+                ", address='" + address + '\'' +
                 ", avatar='" + avatar + '\'' +
                 '}';
     }
@@ -96,6 +108,7 @@ public class User implements Parcelable{
         dest.writeString(email);
         dest.writeString(user_id);
         dest.writeString(username);
+        dest.writeString(address);
         dest.writeString(avatar);
     }
 }
