@@ -40,13 +40,31 @@
 
 
                 <EditText
+                    android:id="@+id/input_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/input_email"
+                    android:layout_marginTop="20dp"
+                    android:hint="Name"
+                    android:inputType="text" />
+
+                <EditText
+                    android:id="@+id/input_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/input_name"
+                    android:layout_marginTop="20dp"
+                    android:hint="Address"
+                    android:inputType="text" />
+
+                <EditText
                     android:id="@+id/input_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/input_address"
                     android:layout_marginTop="20dp"
-                    android:inputType="textPassword"
                     android:hint="@string/password"
-                    android:layout_below="@+id/input_email"/>
+                    android:inputType="textPassword" />
 
                 <EditText
                     android:id="@+id/input_confirm_password"
@@ -58,14 +76,22 @@
                     android:layout_below="@+id/input_password"/>
 
 
+                <CheckBox
+                    android:id="@+id/checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/input_confirm_password"
+                    android:layout_marginTop="20dp"
+                    android:text="I have read and agreed to the terms of service" />
+
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/btn_register"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/checkbox"
                     android:layout_marginTop="35dp"
-                    android:layout_below="@+id/input_confirm_password"
-                    android:text="@string/register"
-                    android:background="@drawable/theme_button"/>
+                    android:background="@drawable/theme_button"
+                    android:text="@string/register" />
 
             </RelativeLayout>
 
