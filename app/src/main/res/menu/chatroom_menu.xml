@@ -5,11 +5,11 @@
 
     <item
         android:id="@+id/action_chatroom_user_list"
-        android:title="@string/action_chatroom_user_list"
+        android:title="Find Parking"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_chatroom_leave"
-        android:title="@string/action_leave_chatroom"
+        android:title="Settings"
         app:showAsAction="never" />
 </menu>

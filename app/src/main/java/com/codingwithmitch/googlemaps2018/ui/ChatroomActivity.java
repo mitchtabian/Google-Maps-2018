@@ -64,6 +64,7 @@ public class ChatroomActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.fragment_user_list);
         setContentView(R.layout.activity_chatroom);
         mMessage = findViewById(R.id.input_message);
         mChatMessageRecyclerView = findViewById(R.id.chatmessage_recycler_view);
@@ -72,7 +73,9 @@ public class ChatroomActivity extends AppCompatActivity implements
 
         mDb = FirebaseFirestore.getInstance();
 
+
         getIncomingIntent();
+
         initChatroomRecyclerView();
         getChatroomUsers();
     }
@@ -115,9 +118,7 @@ public class ChatroomActivity extends AppCompatActivity implements
     private void getChatroomUsers(){
 
         CollectionReference usersRef = mDb
-                .collection(getString(R.string.collection_chatrooms))
-                .document(mChatroom.getChatroom_id())
-                .collection(getString(R.string.collection_chatroom_user_list));
+                .collection(getString(R.string.collection_users));
 
         mUserListEventListener = usersRef
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -138,6 +139,7 @@ public class ChatroomActivity extends AppCompatActivity implements
                                 User user = doc.toObject(User.class);
                                 mUserList.add(user);
                                 getUserLocation(user);
+                                Log.d(TAG, "onEvent: adding user: " + user.toString());
                             }
 
                             Log.d(TAG, "onEvent: user list size: " + mUserList.size());
@@ -231,12 +233,12 @@ public class ChatroomActivity extends AppCompatActivity implements
         mMessage.setText("");
     }
 
-    private void inflateUserListFragment(){
+    public void inflateUserListFragment(){
         hideSoftKeyboard();
         
         UserListFragment fragment = UserListFragment.newInstance();
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(getString(R.string.intent_user_list), mUserList);
+        //bundle.putParcelableArrayList(getString(R.string.intent_user_list), mUserList);
         bundle.putParcelableArrayList(getString(R.string.intent_user_locations), mUserLocations);
         fragment.setArguments(bundle);
 

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,18 +26,19 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.codingwithmitch.googlemaps2018.R;
 import com.codingwithmitch.googlemaps2018.UserClient;
 import com.codingwithmitch.googlemaps2018.adapters.ChatroomRecyclerAdapter;
 import com.codingwithmitch.googlemaps2018.models.Chatroom;
 import com.codingwithmitch.googlemaps2018.models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.codingwithmitch.googlemaps2018.models.UserLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -47,6 +49,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -65,43 +68,101 @@ import static com.codingwithmitch.googlemaps2018.Constants.PERMISSIONS_REQUEST_E
 
 
 public class MainActivity extends AppCompatActivity implements
-        View.OnClickListener,
-        ChatroomRecyclerAdapter.ChatroomRecyclerClickListener {
+        View.OnClickListener {
 
     private static final String TAG = "MainActivity";
 
-    //widgets
-    private ProgressBar mProgressBar;
-
-    //vars
-    private ArrayList<Chatroom> mChatrooms = new ArrayList<>();
-    private Set<String> mChatroomIds = new HashSet<>();
-    private ChatroomRecyclerAdapter mChatroomRecyclerAdapter;
-    private RecyclerView mChatroomRecyclerView;
-    private ListenerRegistration mChatroomEventListener;
     private FirebaseFirestore mDb;
     private boolean mLocationPermissionGranted = false;
     private FusedLocationProviderClient mFusedLocationClient;
     private UserLocation mUserLocation;
+    private ArrayList<UserLocation> mUserLocations = new ArrayList<>();
+    private ArrayList<User> mUserList = new ArrayList<>();
+    private UserListFragment mUserListFragment;
+    private ListenerRegistration mUserListEventListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.fragment_user_list);
         setContentView(R.layout.activity_main);
-        mProgressBar = findViewById(R.id.progressBar);
-        mChatroomRecyclerView = findViewById(R.id.chatrooms_recycler_view);
-
-        //findViewById(R.id.fab_create_chatroom).setOnClickListener(this);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
         mDb = FirebaseFirestore.getInstance();
 
-        initSupportActionBar();
-        initChatroomRecyclerView();
+        getUsers();
+
     }
 
+    private void getUsers(){
+
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        mDb.setFirestoreSettings(settings);
+
+        CollectionReference usersRef = mDb
+                .collection(getString(R.string.collection_users));
+
+        mUserListEventListener = usersRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.e(TAG, "onEvent: Listen failed.", e);
+                            return;
+                        }
+
+                        if(queryDocumentSnapshots != null){
+
+                            // Clear the list and add all the users again
+                            //mUserList.clear();
+                            //mUserList = new ArrayList<>();
+
+                            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                                User user = doc.toObject(User.class);
+                                mUserList.add(user);
+                                getUserLocation(user);
+                                Log.d(TAG, "onEvent: adding user: " + user.toString());
+                            }
+
+                            Log.d(TAG, "onEvent: user list size: " + mUserList.size());
+                        }
+                    }
+                });
+    }
+
+    private void getUserLocation(User user){
+        //Retreive geopoint for each individual user and put into a list
+
+        DocumentReference locationRef = mDb.collection(getString(R.string.collection_user_locations))
+                .document(user.getUser_id());
+
+        locationRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    if(task.getResult().toObject(UserLocation.class) != null ){
+                        mUserLocations.add(task.getResult().toObject(UserLocation.class));
+                    }
+                }
+            }
+        });
+    }
+
+    public void inflateUserListFragment(){
+
+        UserListFragment fragment = UserListFragment.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList(getString(R.string.intent_user_list), mUserList);
+        bundle.putParcelableArrayList(getString(R.string.intent_user_locations), mUserLocations);
+        fragment.setArguments(bundle);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_up);
+        transaction.replace(R.id.user_list_container, fragment, getString(R.string.fragment_user_list));
+        transaction.addToBackStack(getString(R.string.fragment_user_list));
+        transaction.commit();
+    }
     //Step 1: Get User Details
     private void getUserDetails(){
         if(mUserLocation == null) {
@@ -128,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements
             getLastKnownLocation();
         }
     }
-
 
     //Step 3: Upload GPS coordinates to firestore for user
     private void saveUserLocation(){
@@ -221,8 +281,8 @@ public class MainActivity extends AppCompatActivity implements
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
-            getChatrooms();
-            getUserDetails( );
+            //getChatrooms();
+            getUserDetails();
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -277,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ENABLE_GPS: {
                 if(mLocationPermissionGranted){
-                    getChatrooms();
+                    //getChatrooms();
                     getUserDetails();
                 }
                 else{
@@ -289,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initSupportActionBar(){
-        setTitle("Chatrooms");
+        setTitle("Park Shark");
     }
 
 
@@ -297,137 +357,28 @@ public class MainActivity extends AppCompatActivity implements
     public void onClick(View view) {
         switch (view.getId()){
 
-            case R.id.fab_create_chatroom:{
-                newChatroomDialog();
-            }
+            //case R.id.fab_create_chatroom:{
+            //    newChatroomDialog();
+            //}
         }
     }
 
-    private void initChatroomRecyclerView(){
-        mChatroomRecyclerAdapter = new ChatroomRecyclerAdapter(mChatrooms, this);
-        mChatroomRecyclerView.setAdapter(mChatroomRecyclerAdapter);
-        mChatroomRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    }
-
-    private void getChatrooms(){
-
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        mDb.setFirestoreSettings(settings);
-
-        CollectionReference chatroomsCollection = mDb
-                .collection(getString(R.string.collection_chatrooms));
-
-        mChatroomEventListener = chatroomsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                Log.d(TAG, "onEvent: called.");
-
-                if (e != null) {
-                    Log.e(TAG, "onEvent: Listen failed.", e);
-                    return;
-                }
-
-                if(queryDocumentSnapshots != null){
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-
-                        Chatroom chatroom = doc.toObject(Chatroom.class);
-                        if(!mChatroomIds.contains(chatroom.getChatroom_id())){
-                            mChatroomIds.add(chatroom.getChatroom_id());
-                            mChatrooms.add(chatroom);
-                        }
-                    }
-                    Log.d(TAG, "onEvent: number of chatrooms: " + mChatrooms.size());
-                    mChatroomRecyclerAdapter.notifyDataSetChanged();
-                }
-
-            }
-        });
-    }
-
-    private void buildNewChatroom(String chatroomName){
-
-        final Chatroom chatroom = new Chatroom();
-        chatroom.setTitle(chatroomName);
-
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        mDb.setFirestoreSettings(settings);
-
-        DocumentReference newChatroomRef = mDb
-                .collection(getString(R.string.collection_chatrooms))
-                .document();
-
-        chatroom.setChatroom_id(newChatroomRef.getId());
-
-        newChatroomRef.set(chatroom).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                hideDialog();
-
-                if(task.isSuccessful()){
-                    navChatroomActivity(chatroom);
-                }else{
-                    View parentLayout = findViewById(android.R.id.content);
-                    Snackbar.make(parentLayout, "Something went wrong.", Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    private void navChatroomActivity(Chatroom chatroom){
-        Intent intent = new Intent(MainActivity.this, ChatroomActivity.class);
-        intent.putExtra(getString(R.string.intent_chatroom), chatroom);
-        startActivity(intent);
-    }
-
-    private void newChatroomDialog(){
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter a chatroom name");
-
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-
-        builder.setPositiveButton("CREATE", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if(!input.getText().toString().equals("")){
-                    buildNewChatroom(input.getText().toString());
-                }
-                else {
-                    Toast.makeText(MainActivity.this, "Enter a chatroom name", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mChatroomEventListener != null){
-            mChatroomEventListener.remove();
-        }
+        //if(mChatroomEventListener != null){
+        //    mChatroomEventListener.remove();
+        //}
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getChatrooms();
+        //getChatrooms();
         if(checkMapServices()){
             if(mLocationPermissionGranted){
-                getChatrooms();
+                //getChatrooms();
                 getUserDetails();
             }
             else{
@@ -436,10 +387,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onChatroomSelected(int position) {
-        navChatroomActivity(mChatrooms.get(position));
-    }
 
     private void signOut(){
         FirebaseAuth.getInstance().signOut();
@@ -451,20 +398,30 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.chatroom_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
-            case R.id.action_sign_out:{
-                signOut();
+            case android.R.id.home:{
+                UserListFragment fragment =
+                        (UserListFragment) getSupportFragmentManager().findFragmentByTag(getString(R.string.fragment_user_list));
+                if(fragment != null){
+                    if(fragment.isVisible()){
+                        getSupportFragmentManager().popBackStack();
+                        return true;
+                    }
+                }
+                finish();
                 return true;
             }
-            case R.id.action_profile:{
-                startActivity(new Intent(this, ProfileActivity.class));
+            case R.id.action_chatroom_user_list:{
+                inflateUserListFragment();
+                return true;
+            }
+            case R.id.action_chatroom_leave:{
                 return true;
             }
             default:{
@@ -474,13 +431,14 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    /*
     private void showDialog(){
         mProgressBar.setVisibility(View.VISIBLE);
     }
 
     private void hideDialog(){
         mProgressBar.setVisibility(View.GONE);
-    }
+    }*/
 
 
 }

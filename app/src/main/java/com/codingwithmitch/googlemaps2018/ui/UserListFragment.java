@@ -2,6 +2,7 @@ package com.codingwithmitch.googlemaps2018.ui;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +26,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -75,7 +78,7 @@ public class UserListFragment extends Fragment implements
     private static final float DEFAULT_ZOOM = 15f;
 
     //widgets
-    private RecyclerView mUserListRecyclerView;
+    //private RecyclerView mUserListRecyclerView;
     private MapView mMapView;
     private EditText mSearchText;
     //private ImageView mGps;
@@ -84,12 +87,12 @@ public class UserListFragment extends Fragment implements
     //vars
     private ArrayList<User> mUserList = new ArrayList<>();
     private ArrayList<UserLocation> mUserLocations = new ArrayList<>();
-    private UserRecyclerAdapter mUserRecyclerAdapter;
+    //private UserRecyclerAdapter mUserRecyclerAdapter;
     private GoogleMap mGoogleMap;
     private LatLngBounds mMapBoundary;
     private UserLocation mUserPosition;
     private ClusterManager<MyItem> mClusterManager;
-    private MyClusterManagerRenderer mClusterManagerRenderer;
+    //private MyClusterManagerRenderer mClusterManagerRenderer;
     private ArrayList<MyItem> mClusterMarkers = new ArrayList<>();
     private GeoApiContext mGeoApiContext = null;
     private ArrayList<PolylineData> mPolylinesData = new ArrayList<>();
@@ -107,9 +110,24 @@ public class UserListFragment extends Fragment implements
             mUserList = getArguments().getParcelableArrayList(getString(R.string.intent_user_list));
             mUserLocations = getArguments().getParcelableArrayList(getString(R.string.intent_user_locations));
         }
-
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_user_list, container, false);
+        mMapView = (MapView) view.findViewById(R.id.user_list_map);
+        view.findViewById(R.id.btn_reset_map).setOnClickListener(this);
+        view.findViewById(R.id.ic_gps).setOnClickListener(this);
+        mSearchText = (EditText) view.findViewById(R.id.input_search);
+
+        //initUserListRecyclerView();
+        initGoogleMap(savedInstanceState);
+
+        setUserPosition();
+
+        return view;
+    }
     private void addPolylinesToMap(final DirectionsResult result){
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -156,24 +174,6 @@ public class UserListFragment extends Fragment implements
                 }
             }
         });
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_user_list, container, false);
-        mUserListRecyclerView = view.findViewById(R.id.user_list_recycler_view);
-        mMapView = (MapView) view.findViewById(R.id.user_list_map);
-        view.findViewById(R.id.btn_reset_map).setOnClickListener(this);
-        view.findViewById(R.id.ic_gps).setOnClickListener(this);
-        mSearchText = (EditText) view.findViewById(R.id.input_search);
-
-        initUserListRecyclerView();
-        initGoogleMap(savedInstanceState);
-
-        setUserPosition();
-
-        return view;
     }
 
     private void removeTripMarker(){
@@ -374,11 +374,6 @@ public class UserListFragment extends Fragment implements
             Address address = list.get(0);
 
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-
-            //GeoPoint gp = new GeoPoint(address.getLatitude(), address.getLongitude());
-            //mUserPosition.setGeo_point(gp);
-            //setCameraView();
 
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()),
                     DEFAULT_ZOOM,
@@ -397,11 +392,11 @@ public class UserListFragment extends Fragment implements
     }
 
 
-    private void initUserListRecyclerView() {
+    /*private void initUserListRecyclerView() {
         mUserRecyclerAdapter = new UserRecyclerAdapter(mUserList);
         mUserListRecyclerView.setAdapter(mUserRecyclerAdapter);
         mUserListRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-    }
+    }*/
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -589,4 +584,5 @@ public class UserListFragment extends Fragment implements
                 null
         );
     }
+
 }
