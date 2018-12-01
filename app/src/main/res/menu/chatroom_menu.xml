@@ -9,7 +9,23 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_chatroom_leave"
-        android:title="Settings"
+        android:id="@+id/action_rent"
+        android:title="Rent a spot"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/action_history"
+        android:title="History"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_payment"
+        android:title="Payment Methods"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_sign_out"
+        android:title="Sign Out"
         app:showAsAction="never" />
 </menu>

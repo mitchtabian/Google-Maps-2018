@@ -333,7 +333,7 @@ public class ChatroomActivity extends AppCompatActivity implements
                 inflateUserListFragment();
                 return true;
             }
-            case R.id.action_chatroom_leave:{
+            case R.id.action_sign_out:{
                 leaveChatroom();
                 return true;
             }

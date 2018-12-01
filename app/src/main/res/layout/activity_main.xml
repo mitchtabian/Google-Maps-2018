@@ -6,22 +6,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/chatrooms_recycler_view">
-
-    </android.support.v7.widget.RecyclerView>
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="20dp"
-        android:elevation="6dp"
-        android:src="@drawable/ic_add_white_24dp"
-        android:id="@+id/fab_create_chatroom"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/welcome_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:layout_marginBottom="20dp"
+            android:text="Welcome to ParkShark!"
+            android:textSize="30sp" />
+
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/welcome_title"
+            android:layout_marginTop="0dp"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
+            android:text="Please click the menu to get started"
+            android:textSize="20sp" />
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/description"
+            android:id="@+id/logo"
+            android:src="@drawable/parkshark" />
+
+
+    </RelativeLayout>
+
 
     <FrameLayout
         android:layout_width="match_parent"

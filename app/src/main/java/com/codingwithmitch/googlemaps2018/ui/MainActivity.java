@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -24,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements
     private ArrayList<User> mUserList = new ArrayList<>();
     private UserListFragment mUserListFragment;
     private ListenerRegistration mUserListEventListener;
+    private ImageView logo;
 
 
     @Override
@@ -87,8 +90,12 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        logo = (ImageView) findViewById(R.id.logo);
+
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mDb = FirebaseFirestore.getInstance();
+        getSupportActionBar().setTitle("Park Shark");  // provide compatibility to all the versions
 
         getUsers();
 
@@ -421,7 +428,22 @@ public class MainActivity extends AppCompatActivity implements
                 inflateUserListFragment();
                 return true;
             }
-            case R.id.action_chatroom_leave:{
+            case R.id.action_rent :{
+                return true;
+            }
+
+            case R.id.action_history: {
+
+
+            }
+
+            case R.id.action_payment: {
+
+
+            }
+
+            case R.id.action_sign_out: {
+                signOut();
                 return true;
             }
             default:{
