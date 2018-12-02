@@ -2,15 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.codingwithmitch.googlemaps2018">
 
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <uses-permission
-        android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"/>
+        android:required="true" />
 
     <application
         android:name=".UserClient"
@@ -20,10 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".ui.MainActivity">
-        </activity>
-        <activity android:name=".ui.LoginActivity" >
+        <activity android:name=".ui.MainActivity"></activity>
+        <activity android:name=".ui.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,12 +27,11 @@
         </activity>
         <activity android:name=".ui.RegisterActivity" />
         <activity android:name=".ui.ChatroomActivity" />
-        <activity android:name=".ui.ProfileActivity"/>
+        <activity android:name=".ui.ProfileActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/maps_api_key"/>
-
+            android:value="@string/maps_api_key" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -46,6 +40,7 @@
             android:name="org.apache.http.legacy"
             android:required="false" />
 
+        <activity android:name=".ui.CreditCardActivity"></activity>
     </application>
 
 </manifest>

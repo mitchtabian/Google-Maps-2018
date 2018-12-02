@@ -19,8 +19,9 @@
         android:title="History"
         app:showAsAction="never" />
 
+
     <item
-        android:id="@+id/action_payment"
+        android:id="@+id/action_add_card"
         android:title="Payment Methods"
         app:showAsAction="never" />
 

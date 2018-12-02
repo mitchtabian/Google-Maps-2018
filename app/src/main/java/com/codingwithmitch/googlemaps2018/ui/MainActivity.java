@@ -432,15 +432,17 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             }
 
+            case R.id.action_add_card:{
+               startActivity(new Intent(MainActivity.this, CreditCardActivity.class));
+               return true;
+           }
+
             case R.id.action_history: {
 
 
             }
 
-            case R.id.action_payment: {
 
-
-            }
 
             case R.id.action_sign_out: {
                 signOut();

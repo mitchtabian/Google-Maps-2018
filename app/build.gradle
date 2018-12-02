@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.codingwithmitch.googlemaps2018"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -47,11 +47,14 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:2.2.0'
 
     // Google marker cluster
-    implementation'com.google.maps.android:android-maps-utils:0.5+'
+    implementation 'com.google.maps.android:android-maps-utils:0.5+'
 
     //Google directions
     implementation 'com.google.maps:google-maps-services:0.9.0'
     implementation 'org.slf4j:slf4j-simple:1.7.25'
+
+
+    implementation "com.craftman.cardform:cardform:0.0.2"
 
     //Google services
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
