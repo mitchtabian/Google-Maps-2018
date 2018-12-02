@@ -1,17 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/White">
 
-
-    <android.support.v7.widget.RecyclerView
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/user_list_recycler_view">
+        android:orientation="vertical"
+        android:weightSum="100"
+        android:background="@color/White">
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0"
+            android:id="@+id/user_list_recycler_view">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="100"
+            android:id="@+id/map_container">
+
+            <com.google.android.gms.maps.MapView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/user_list_map" />
+            
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:elevation="10dp"
+                android:background="@drawable/white_border"
+                android:id="@+id/relLayout1">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:id="@+id/ic_magnify"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/ic_magnify"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_toRightOf="@id/ic_magnify"
+                    android:inputType="textNoSuggestions"
+                    android:layout_centerVertical="true"
+                    android:textSize="15sp"
+                    android:textColor="#000"
+                    android:id="@+id/input_search"
+                    android:background="@null"
+                    android:hint="Enter Address, City, or Postal Code"
+                    android:imeOptions="actionSearch"/>
+            </RelativeLayout>
+
+            <ImageButton
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/ic_refresh_black_24dp"
+                android:background="@color/White"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:id="@+id/btn_reset_map"
+                />
+        </RelativeLayout>
 
 
-    </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+</RelativeLayout>
