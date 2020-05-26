@@ -58,7 +58,7 @@
                     android:layout_below="@+id/input_password"/>
 
 
-                <android.support.v7.widget.AppCompatButton
+                <Button
                     android:id="@+id/btn_register"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
